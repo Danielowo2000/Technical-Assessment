@@ -103,26 +103,4 @@ def load_dataset(split='train', img_size=(256, 256)):
     
     return images, masks
 
-    def __init__(self, num_classes=2):
-        super(SimpleSegmentationModel, self).__init__()
-        try:
-            self.backbone = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
-        except Exception as e:
-            print("Warning: Could not load pretrained weights. Using random initialization.")
-            self.backbone = models.resnet18(weights=None)
-            
-        # Remove the final fully connected layer and pooling
-        self.backbone = nn.Sequential(*list(self.backbone.children())[:-2])
-        
-        # Add a more appropriate segmentation head
-        self.segmentation_head = nn.Sequential(
-            nn.Conv2d(512, 256, kernel_size=3, padding=1),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, num_classes, kernel_size=1)
-        )
-    
-    def forward(self, x):
-        features = self.backbone(x)
-        return self.segmentation_head(features)
 
